@@ -55,4 +55,4 @@ NOTE
 (cd "$STAGE" && zip -qr "$OUT/$NAME-$VERSION.zip" "$NAME")
 
 echo "Built $OUT/$NAME-$VERSION.zip"
-unzip -l "$OUT/$NAME-$VERSION.zip" | tail -3
+unzip -l "$OUT/$NAME-$VERSION.zip" | awk 'END { print NR-5 " files" }'

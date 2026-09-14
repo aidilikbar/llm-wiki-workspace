@@ -125,7 +125,10 @@ else
   say "Fetching $REPO_SLUG@$REF ..."
   curl -fsSL "$url" | tar xz -C "$TMPDIR_DL" \
     || die "could not download $url"
-  root=$(find "$TMPDIR_DL" -mindepth 1 -maxdepth 1 -type d | head -n 1)
+  # Pure shell — no head(1). Some environments (conda, perl LWP) shadow it with a
+  # URL fetcher that does not understand -n.
+  root=""
+  for d in "$TMPDIR_DL"/*/; do root="${d%/}"; break; done
   [ -d "$root/template" ] || die "downloaded archive has no template/ directory"
   SRC="$root/template"
   PRESET="$root/obsidian-preset"
@@ -153,7 +156,8 @@ list_files() {
 # is a real date. Templates carry the literal YYYY-MM-DD and keep it.
 stamp_date() {
   f="$1"; today="$2"
-  head -n 1 "$f" | grep -q '^---$' || return 0
+  IFS= read -r first < "$f" || first=""
+  [ "$first" = "---" ] || return 0
   awk -v today="$today" '
     NR == 1 { print; next }
     !done && /^---$/ { done = 1; print; next }

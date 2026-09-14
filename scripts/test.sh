@@ -162,6 +162,40 @@ else
   echo "  skip  no $DENY_FILE — create it to check for private names"
 fi
 
+echo "13. Survives a hostile PATH"
+# conda and perl LWP both ship a `head` that fetches URLs and rejects -n. Anything the
+# installer needs must either not be shadowed or not be used.
+mkdir -p "$TMP/hostile"
+cat > "$TMP/hostile/head" <<'SHADOW'
+#!/bin/sh
+echo "Unknown option: n" >&2
+echo "Usage: head [-options] <url>..." >&2
+exit 1
+SHADOW
+chmod +x "$TMP/hostile/head"
+check "install.sh runs with head(1) shadowed" \
+  "PATH='$TMP/hostile:$PATH' bash '$ROOT/install.sh' '$TMP/hostile-out' >/dev/null 2>&1"
+check "the tree is complete anyway" \
+  "[ -e '$TMP/hostile-out/system/RULES.md' ] && [ -e '$TMP/hostile-out/AGENTS.md' ]"
+check "front matter was still stamped" \
+  "grep -q \"^updated: $(date +%F)\$\" '$TMP/hostile-out/state/STATE.md'"
+if command -v node >/dev/null 2>&1; then
+  check "the node installer too" \
+    "PATH='$TMP/hostile:$PATH' node '$ROOT/bin/cli.js' '$TMP/hostile-node' >/dev/null 2>&1"
+fi
+
+echo "14. The standalone download route"
+# install.sh with no template/ beside it must fetch the repository itself. Skipped
+# without network, since that is the one thing this check cannot fake.
+mkdir -p "$TMP/alone"
+cp "$ROOT/install.sh" "$TMP/alone/install.sh"
+if curl -fsS --max-time 20 -o /dev/null "https://codeload.github.com/${LWW_REPO:-aidilikbar/llm-wiki-workspace}/tar.gz/refs/heads/${LWW_REF:-main}" 2>/dev/null; then
+  check "downloads and installs with no template/ present" \
+    "cd '$TMP/alone' && bash install.sh '$TMP/alone/out' >/dev/null 2>&1 && [ -e '$TMP/alone/out/system/RULES.md' ]"
+else
+  echo "  skip  no network to codeload.github.com"
+fi
+
 echo ""
 echo "$pass passed, $fail failed"
 [ "$fail" -eq 0 ]
