@@ -1,0 +1,27 @@
+{
+  "collapse-filter": false,
+  "search": "",
+  "showTags": true,
+  "showAttachments": false,
+  "hideUnresolved": true,
+  "showOrphans": true,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    { "query": "path:context/", "color": { "a": 1, "rgb": 5012976 } },
+    { "query": "path:state/", "color": { "a": 1, "rgb": 14721854 } },
+    { "query": "path:record/", "color": { "a": 1, "rgb": 4170843 } },
+    { "query": "path:work/", "color": { "a": 1, "rgb": 9080728 } },
+    { "query": "path:system/", "color": { "a": 1, "rgb": 10181072 } }
+  ],
+  "collapse-display": false,
+  "showArrows": true,
+  "textFadeMultiplier": 0,
+  "nodeSizeMultiplier": 1,
+  "lineSizeMultiplier": 1,
+  "collapse-forces": false,
+  "centerStrength": 0.5,
+  "repelStrength": 10,
+  "linkStrength": 1,
+  "linkDistance": 250,
+  "scale": 1
+}

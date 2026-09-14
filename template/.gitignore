@@ -1,0 +1,9 @@
+work/temp/*
+!work/temp/.gitkeep
+
+# Obsidian per-machine state — safe to ignore, the shared config is app.json,
+# appearance.json, core-plugins.json and templates.json
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.trash/

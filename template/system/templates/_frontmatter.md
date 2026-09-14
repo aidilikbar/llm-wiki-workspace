@@ -1,3 +1,10 @@
+---
+status: active
+updated: 2026-01-01
+owner: TODO
+classification: public
+---
+
 # Front matter schema
 
 Every markdown file in this workspace carries YAML front matter. This is the mechanism

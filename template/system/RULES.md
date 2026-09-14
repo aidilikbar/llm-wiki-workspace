@@ -1,3 +1,10 @@
+---
+status: active
+updated: 2026-01-01
+owner: TODO
+classification: public
+---
+
 # RULES.md
 
 Policy for this workspace. Applies to humans and agents equally.

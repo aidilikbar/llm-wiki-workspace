@@ -1,7 +1,7 @@
 ---
 status: current
-updated: 2026-09-11
-owner: <human owner>
+updated: 2026-01-01
+owner: TODO
 classification: internal
 ---
 
@@ -47,22 +47,3 @@ Files whose `updated` date has passed its review cadence and that someone is cur
 trusting anyway.
 
 - `<path>` — last updated <date>, <what may be wrong>
-
----
-
-## Example (delete this section)
-
-**Now:** Reworking the ingestion pipeline to handle documents with no machine-readable
-date field.
-
-**Sprint:** 14, ends 2026-09-19. Goal: ingestion handles the full source corpus without
-manual pre-processing. On track: at risk — the undated-document case was not scoped.
-
-**Open decisions:** (1) Infer missing dates from document content, or reject and queue for
-manual review? Waiting on owner since 2026-09-09.
-
-**Blocked:** Eval suite — blocked by undated-document handling since 2026-09-09. Unblocks
-once decision 1 lands.
-
-**Recently changed:** 2026-09-10 — schema gained a `date_confidence` field; existing rows
-backfilled as `null`, not `0`, so absence stays distinguishable from low confidence.

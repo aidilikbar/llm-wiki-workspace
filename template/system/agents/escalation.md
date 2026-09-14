@@ -1,7 +1,7 @@
 ---
 status: active
-updated: 2026-09-11
-owner: <human owner>
+updated: 2026-01-01
+owner: TODO
 classification: public
 ---
 

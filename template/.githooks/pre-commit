@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+# LLM Wiki Workspace — front matter check.
+#
+# Rejects any staged markdown file missing the four required fields. Warns (does not
+# reject) when a context/ file's review_by date has passed.
+#
+# Enable with:  git config core.hooksPath .githooks
+
+set -uo pipefail
+
+REQUIRED=(status updated owner classification)
+today=$(date +%F)
+fail=0
+
+# Print the YAML front matter block of a file: everything between the leading '---'
+# and the next '---'. Empty if the file does not open with '---'.
+frontmatter() {
+  awk 'NR==1 && $0 != "---" { exit }
+       NR==1 { next }
+       $0 == "---" { exit }
+       { print }' "$1"
+}
+
+while IFS= read -r f; do
+  [[ -f "$f" ]] || continue
+  fm=$(frontmatter "$f")
+
+  if [[ -z "$fm" ]]; then
+    echo "front matter missing entirely: $f"
+    fail=1
+    continue
+  fi
+
+  for k in "${REQUIRED[@]}"; do
+    grep -q "^$k:[[:space:]]*[^[:space:]]" <<<"$fm" \
+      || { echo "front matter missing '$k': $f"; fail=1; }
+  done
+
+  review=$(grep -m1 '^review_by:' <<<"$fm" | sed 's/^review_by:[[:space:]]*//')
+  if [[ -n "$review" && "$review" < "$today" ]]; then
+    echo "warning: review_by $review has passed: $f"
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACM \
+         | grep '\.md$' \
+         | grep -v '^work/temp/' \
+         | grep -vE '(^|/)(README|AGENTS)\.md$')
+
+exit $fail

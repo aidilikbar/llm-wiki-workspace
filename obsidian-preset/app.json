@@ -1,0 +1,12 @@
+{
+  "attachmentFolderPath": "work/temp",
+  "newFileLocation": "folder",
+  "newFileFolderPath": "work/temp",
+  "useMarkdownLinks": false,
+  "alwaysUpdateLinks": true,
+  "showUnsupportedFiles": false,
+  "promptDelete": true,
+  "trashOption": "local",
+  "showFrontmatter": true,
+  "propertiesInDocument": "visible"
+}

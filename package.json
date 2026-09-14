@@ -1,0 +1,17 @@
+{
+  "name": "llm-wiki-workspace",
+  "version": "1.0.0",
+  "description": "A folder structure for working with AI agents on long-running projects: files organised by mutability, with front matter that makes staleness visible. Installs into any repository or Obsidian vault.",
+  "keywords": ["agents", "agentic", "obsidian", "documentation", "scaffold", "template", "knowledge-management", "llm", "agents-md"],
+  "license": "CC0-1.0",
+  "homepage": "https://github.com/aidilikbar/llm-wiki-workspace#readme",
+  "repository": { "type": "git", "url": "git+https://github.com/aidilikbar/llm-wiki-workspace.git" },
+  "bugs": { "url": "https://github.com/aidilikbar/llm-wiki-workspace/issues" },
+  "bin": { "llm-wiki-workspace": "bin/cli.js" },
+  "files": ["bin/", "template/", "obsidian-preset/", "install.sh", "README.md", "LICENSE"],
+  "engines": { "node": ">=14" },
+  "scripts": {
+    "test": "bash scripts/test.sh",
+    "zip": "bash scripts/make-vault-zip.sh"
+  }
+}
