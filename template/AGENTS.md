@@ -29,8 +29,8 @@ when the task needs them.
 - If a `state/` file is older than 7 days, say so and ask before treating it as current.
 - If `context/` and `state/` disagree, `context/` wins and the conflict goes in
   `record/decisions/`.
-- If the task is not represented in `state/backlog.md` or `state/sprint-current.md`,
-  ask whether to add it before doing it.
+- If the task is not represented in `state/backlog/` or in the current sprint in
+  `state/sprints/`, ask whether to add it before doing it.
 
 ## While you work
 
@@ -40,12 +40,14 @@ when the task needs them.
 - Every file you create gets front matter. Schema: `system/templates/_frontmatter.md`.
 - Never write a `classification` higher than the zone allows. See `system/RULES.md`.
 - Scratch work goes to `work/temp/`, not into `state/` or `context/`.
+- Collections are one file per item — backlog, sprints, requirements, decisions and the
+  rest. Names and IDs: `system/RULES.md` §9.
 
 ## Definition of done
 
 A task is done when all of these hold. If you cannot satisfy one, say which and stop.
 
-- [ ] The acceptance criteria in `context/requirements/acceptance-criteria.md` are met
+- [ ] The acceptance criteria of every requirement the task serves (`context/requirements/R-NNN-*.md`) are met
 - [ ] Tests pass, or you have stated explicitly that there are none
 - [ ] `state/STATE.md` reflects the new situation
 - [ ] `state/handoff.md` names the next concrete action

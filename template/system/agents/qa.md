@@ -13,7 +13,7 @@ classification: public
 
 ## Read first
 
-`context/requirements/acceptance-criteria.md` first. A criterion that cannot be checked is a finding, not an obstacle.
+`context/requirements/` first — the acceptance criteria inside each requirement the work serves. A criterion that cannot be checked is a finding, not an obstacle.
 
 ## Produces
 

@@ -17,7 +17,7 @@ classification: public
 
 ## Produces
 
-Updated `STATE.md` (one screen), `handoff.md` ending in one concrete next action, a `record/logbook/` entry per session, closed sprints moved to `record/sprints/`.
+Updated `STATE.md` (one screen), `handoff.md` ending in one concrete next action, a `record/logbook/` entry per session, closed sprints moved to `record/sprints/`, finished backlog items moved to `record/backlog/`.
 
 ## Characteristic failure
 

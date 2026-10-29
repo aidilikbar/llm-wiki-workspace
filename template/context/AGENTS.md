@@ -9,5 +9,6 @@ High trust. Changes here are deliberate and usually imply a decision record.
 - `constraints/` is the highest-value folder for you. Read it before proposing any
   technical approach — it records where this project deliberately diverges from the
   common pattern, which is exactly what you would otherwise default to.
-- `requirements/acceptance-criteria.md` defines done. If a requirement has no acceptance
-  criterion, say so rather than inventing one.
+- `requirements/` holds one file per requirement, `R-NNN-slug.md`, each with its own
+  acceptance criteria. Together they define done. If a requirement has no acceptance
+  criteria, say so rather than inventing them.

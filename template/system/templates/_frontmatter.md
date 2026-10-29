@@ -24,7 +24,7 @@ classification: public | internal | restricted | air-gapped
 
 | Field | Notes |
 |---|---|
-| `status` | `draft` means not yet trustworthy. `superseded` files stay in place; they are not deleted. |
+| `status` | `draft` means not yet trustworthy. `superseded` files stay in place; they are not deleted. Collection items use their own vocabulary — see below. |
 | `updated` | The date the **content** changed, not the date the file was touched. Reformatting is not an update. |
 | `owner` | A person or a role from `system/agents/`. Never "team" — that means nobody. |
 | `classification` | See `system/RULES.md` §1. Absent means treat as `restricted`. |
@@ -36,9 +36,29 @@ type: architecture | product | process | data    # decisions only
 supersedes: 0031                                  # decisions only, when replacing one
 generated: true                                   # never hand-edit this file
 source: <generator command>                       # required when generated: true
-review_by: YYYY-MM-DD                             # context/ files, default updated + 90d
+review_by: YYYY-MM-DD                             # context/ default updated + 90d; research + 30d
 tags: [ingestion, schema]                         # optional, keep under 5
+id: T-012                                         # collection items with an ID (RULES §9)
+kind: functional | non-functional                 # requirements only
+promoted-to: record/decisions/0007-slug.md        # research only, once promoted
+backlog-ref: state/backlog/T-012-slug.md          # .handoff/ task files only
 ```
+
+## Status by file type
+
+`status` is required everywhere; its values depend on what the file is.
+
+| File | `status` values |
+|---|---|
+| Most files, requirements | `draft`, `active`, `superseded`, `archived` |
+| Decisions | `proposed`, `active`, `superseded` |
+| Backlog items | `ready`, `needs-refinement`, `blocked`, `in-progress`, `done`, `dropped` |
+| Icebox items | `iced` |
+| Sprints | `current`, `closed` |
+| Research | `open`, `concluded`, `promoted`, `abandoned` |
+| Prompts | `draft`, `active`, `retired` |
+| `.handoff/` tasks | `ready`, `in-progress`, `done`, `blocked` |
+| `.handoff/` results | `done`, `partial`, `blocked` |
 
 ## Examples
 

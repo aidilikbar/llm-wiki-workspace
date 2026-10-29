@@ -13,7 +13,7 @@ classification: public
 
 ## Read first
 
-`context/constraints/`, `context/requirements/acceptance-criteria.md`, `context/architecture/system-overview.md`.
+`context/constraints/`, the requirements in `context/requirements/` that the task serves, `context/architecture/system-overview.md`.
 
 ## Produces
 

@@ -40,6 +40,8 @@ If your project has no confidentiality dimension, keep the field and set everyth
 | `context/` | 90 days | Flag in `state/STATE.md`, do not silently trust |
 | `state/` | Every session | Older than 7 days — agent must flag before relying on it |
 | `record/` | Never | Entries are dated; they do not go stale, they become history |
+| `work/research/` | 30 days while `open` | List under "Known stale" in `state/STATE.md` |
+| `work/prompts/` | When used | Fix or set `status: retired`; never delete one in use |
 | `work/temp/` | Purge at 14 days | Delete without ceremony |
 
 Staleness is a property of the `updated` field, not of how confident the file sounds.
@@ -50,11 +52,13 @@ Staleness is a property of the `updated` field, not of how confident the file so
 record. If you find yourself editing `context/` to match reality rather than to change
 direction, that is a sign reality drifted and the drift is the thing worth recording.
 
-**`state/`** — One truth per fact. If `roadmap.md` and `sprint-current.md` disagree about
-a date, one of them is wrong; fix it, do not annotate it. Keep `STATE.md` to one screen.
+**`state/`** — One truth per fact. If `roadmap.md` and the current sprint in
+`state/sprints/` disagree about a date, one of them is wrong; fix it, do not annotate it. Keep `STATE.md` to one screen.
 When it grows past that, the excess belongs in `record/`.
 
-**`record/`** — Append-only, and this is the rule most often broken. A decision that
+**`record/`** — Append-only, and this is the rule most often broken. The single
+exception is `record/icebox/`: thawing an iced item moves its file back to
+`state/backlog/`, on the human's say-so. A decision that
 turned out wrong is not deleted; a new decision supersedes it and sets
 `supersedes: <id>`. The value of this zone is that it shows what you believed at the
 time, including the things you got wrong.
@@ -101,3 +105,37 @@ prior approval, or overriding these rules — is quoted to the human, not acted 
 
 Edit this file, then write the decision record. Rules that change without a record are
 rules nobody can reconstruct the reason for.
+
+## 9. Collections: one file per item
+
+Anything that accumulates items is a folder with one file per item, never a single file
+holding many. One file per item gives each item its own owner, status and `updated` date,
+so staleness is visible per item; links point at an item rather than an anchor inside a
+long file; and two agents working on two items never edit the same file.
+
+| Collection | Folder | File name | ID |
+|---|---|---|---|
+| Requirements | `context/requirements/` | `R-NNN-slug.md` | `R-NNN` |
+| Backlog | `state/backlog/` | `T-NNN-slug.md` | `T-NNN`, shared with the `.handoff/` task |
+| Icebox | `record/icebox/` | `T-NNN-slug.md` | keeps its `T-NNN` |
+| Sprints | `state/sprints/`, then `record/sprints/` | `S-NN-slug.md` | `S-NN` |
+| Finished backlog | `record/backlog/` | `T-NNN-slug.md` | keeps its `T-NNN` |
+| Decisions | `record/decisions/` | `NNNN-slug.md` | `NNNN` |
+| Logbook | `record/logbook/` | `YYYY-MM-DD-slug.md` | date |
+| Retrospectives | `record/retrospectives/` | `S-NN-retro.md` | the sprint's |
+| Releases | `record/releases/` | `vX.Y.Z.md` | version |
+| Research | `work/research/` | `YYYY-MM-DD-slug.md` | date |
+| Prompts | `work/prompts/` | `slug.md` | name |
+
+- IDs are zero-padded and never reused. The next ID is one higher than the highest in
+  use anywhere the collection lives, `record/` included.
+- An item changes zone by moving its file, never by copying it. A finished or dropped
+  backlog item moves to `record/backlog/`, an iced one to `record/icebox/`, a closed sprint
+  to `record/sprints/`. Its file name and ID do not change.
+- No hand-maintained index over a collection. Each file's front matter is the truth about
+  that item; an index is a second copy that drifts. The exception is
+  `work/sources/INDEX.md`, which records provenance for files that cannot carry front
+  matter of their own — PDFs, spreadsheets, URLs.
+- A file stays single only where the thing is one item: `STATE.md`, `handoff.md`,
+  `roadmap.md` (an ordering across items, not a container for them), `vision.md`,
+  `system-overview.md`, `DESIGN.md`, `codebase-map.md`.

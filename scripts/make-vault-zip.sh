@@ -22,7 +22,7 @@ mkdir -p "$OUT"
 mkdir -p "$STAGE/$NAME"
 
 # Full tree plus the Obsidian config, so the unzipped folder opens as a vault.
-bash "$ROOT/install.sh" --full --obsidian "$STAGE/$NAME" >/dev/null
+bash "$ROOT/install.sh" --yes --full --obsidian "$STAGE/$NAME" >/dev/null
 
 cat > "$STAGE/$NAME/OPEN-ME-FIRST.md" <<'NOTE'
 ---

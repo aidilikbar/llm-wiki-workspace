@@ -10,3 +10,9 @@ Permanent. This zone is the project's memory and its value comes from being uned
 - Filenames are zero-padded and never renumbered: `0042-short-slug.md`.
 - If you believe an entry is factually wrong, append a correction entry. Do not touch
   the original.
+- Some entries arrive by being moved from `state/`: finished backlog items into
+  `backlog/`, iced items into `icebox/`, closed sprints into `sprints/`. Once here they
+  are not edited.
+- `icebox/` is the one exception to permanence. Thawing an item moves its file back to
+  `state/backlog/` — a move, never an edit in place — and only when the human says so.
+  Nothing else ever leaves `record/`.
