@@ -17,6 +17,18 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Tag matches the version in the code
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          for v in "$(node -p "require('./package.json').version")" \
+                   "$(bash install.sh --version)" \
+                   "$(node bin/cli.js --version)"; do
+            [ "$v" = "$tag" ] || { echo "version $v does not match tag $GITHUB_REF_NAME"; exit 1; }
+          done
+
+      - name: Release notes exist
+        run: test -f "docs/releases/${GITHUB_REF_NAME}.md"
+
       - name: Verify before publishing
         run: bash scripts/test.sh
 
@@ -27,4 +39,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.zip
-          generate_release_notes: true
+          body_path: docs/releases/${{ github.ref_name }}.md

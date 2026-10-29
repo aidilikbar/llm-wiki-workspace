@@ -16,7 +16,7 @@
 
 set -euo pipefail
 
-VERSION="1.1.0"
+VERSION="0.1.0"
 REPO_SLUG="${LWW_REPO:-aidilikbar/llm-wiki-workspace}"
 REF="${LWW_REF:-main}"
 

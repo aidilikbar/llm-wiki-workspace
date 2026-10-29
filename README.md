@@ -45,7 +45,7 @@ curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/main/
 It asks what you want, then generates it:
 
 ```
-  LLM Wiki Workspace  v1.1.0
+  LLM Wiki Workspace  v0.1.0
 
  What would you like to set up?
    [1] A workspace — the knowledge base your agents read and write
@@ -95,7 +95,8 @@ curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/main/
 
 - **npx** — `npx llm-wiki-workspace` asks the same questions and takes the same flags.
   Use it on Windows, where it runs without bash. On Windows it cannot open the terminal
-  for questions, so pass flags.
+  for questions, so pass flags. *Not yet published to npm — until it is, use the curl
+  route.*
 - **GitHub template** — click **Use this template** on
   [the repository](https://github.com/aidilikbar/llm-wiki-workspace), clone it, then run
   `bash install.sh --yes --full --eject .` to flatten it. `--eject` deletes `template/`,

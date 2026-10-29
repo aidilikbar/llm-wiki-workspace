@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-const VERSION = '1.1.0';
+const VERSION = '0.1.0';
 const ROOT = path.resolve(__dirname, '..');
 const SRC = path.join(ROOT, 'template');
 const PRESET = path.join(ROOT, 'obsidian-preset');
