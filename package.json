@@ -1,6 +1,6 @@
 {
   "name": "llm-wiki-workspace",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A folder structure for working with AI agents on long-running projects: files organised by mutability, with front matter that makes staleness visible. Installs into any repository or Obsidian vault.",
   "keywords": [
     "agents",

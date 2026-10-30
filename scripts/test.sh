@@ -19,13 +19,16 @@ export LWW_NONINTERACTIVE=1
 export GIT_AUTHOR_NAME="Test" GIT_AUTHOR_EMAIL="test@example.invalid"
 export GIT_COMMITTER_NAME="Test" GIT_COMMITTER_EMAIL="test@example.invalid"
 HAVE_NODE=0; command -v node >/dev/null 2>&1 && HAVE_NODE=1
+# Which bash runs install.sh. CI sets LWW_BASH=/bin/bash on macOS to test bash 3.2.
+BASH_BIN="${LWW_BASH:-bash}"
+echo "install.sh runs under: $("$BASH_BIN" --version | sed -n 1p)"
 
 pass=0
 fail=0
 ok()    { printf '  ok    %s\n' "$1"; pass=$((pass + 1)); }
 bad()   { printf '  FAIL  %s\n' "$1"; fail=$((fail + 1)); }
 check() { if eval "$2" >/dev/null 2>&1; then ok "$1"; else bad "$1"; fi; }
-I()     { bash "$ROOT/install.sh" "$@" >/dev/null 2>&1; }   # bash installer, quiet
+I()     { "$BASH_BIN" "$ROOT/install.sh" "$@" >/dev/null 2>&1; }   # bash installer, quiet
 N()     { node "$ROOT/bin/cli.js" "$@" >/dev/null 2>&1; }   # node installer, quiet
 fm()    { awk 'NR==1 && $0!="---"{exit} NR==1{next} $0=="---"{exit} {print}' "$1"; }
 commits() { git -C "$1" rev-list --count HEAD 2>/dev/null || echo 0; }
@@ -39,7 +42,7 @@ if [ "$HAVE_NODE" -eq 1 ]; then
   check "package.json ships every payload folder" \
     "node -e \"const f=require('$ROOT/package.json').files;process.exit(['template/','handoff/','kickoff/','obsidian-preset/'].every(x=>f.includes(x))?0:1)\""
   check "installers report the same version" \
-    "[ \"\$(bash '$ROOT/install.sh' --version)\" = \"\$(node '$ROOT/bin/cli.js' --version)\" ]"
+    "[ \"\$('$BASH_BIN' '$ROOT/install.sh' --version)\" = \"\$(node '$ROOT/bin/cli.js' --version)\" ]"
 fi
 for f in "$ROOT"/obsidian-preset/*.json; do
   check "$(basename "$f") is valid JSON" "python3 -c \"import json;json.load(open('$f'))\""
@@ -92,7 +95,7 @@ check "updated: is stamped to today"  "grep -q \"^updated: $(date +%F)\$\" '$TMP
 check "templates keep YYYY-MM-DD"     "grep -q '^updated: YYYY-MM-DD$' '$TMP/core/system/templates/adr.md'"
 check "without --owner, owner stays TODO" "grep -qx 'owner: TODO' '$TMP/core/state/STATE.md'"
 check "install exits 0"               "I --yes '$TMP/exit1'"
-check "--help exits 0"                "bash '$ROOT/install.sh' --help"
+check "--help exits 0"                "'$BASH_BIN' '$ROOT/install.sh' --help"
 check "an unknown flag fails"         "! I --bogus"
 check "a flag missing its value fails" "! I --project"
 
@@ -123,7 +126,7 @@ check "plain install writes no .obsidian" "[ ! -e '$TMP/full/.obsidian' ]"
 echo "8. Existing folders"
 mkdir -p "$TMP/existing"; printf 'MINE\n' > "$TMP/existing/AGENTS.md"
 check "a non-empty folder is refused"     "! I --yes '$TMP/existing'"
-refusal=$(bash "$ROOT/install.sh" --yes "$TMP/existing" 2>&1 || true)
+refusal=$("$BASH_BIN" "$ROOT/install.sh" --yes "$TMP/existing" 2>&1 || true)
 check "…with a message that says why" \
   "printf '%s' \"\$refusal\" | grep -q 'already exists and is not empty'"
 check "…and nothing is written"           "[ \$(ls -A '$TMP/existing' | wc -l) -eq 1 ]"
@@ -137,9 +140,10 @@ check "a folder holding only .git counts as empty" "I --yes '$TMP/gitonly'"
 check "a dry run creates nothing"         "I --yes --dry-run '$TMP/dry' && [ ! -e '$TMP/dry' ]"
 
 echo "9. --git: verified hook and a first commit"
-out=$(bash "$ROOT/install.sh" --yes --git "$TMP/repo" 2>&1); rc=$?
+out=$("$BASH_BIN" "$ROOT/install.sh" --yes --git "$TMP/repo" 2>&1); rc=$?
 check "install with --git exits 0"        "[ $rc -eq 0 ]"
-check "it reports Installation complete"  "printf '%s' \"\$out\" | grep -q '^Installation complete.'"
+check "it reports Installation complete, and nothing else" \
+  "[ \"\$(printf '%s\n' \"\$out\" | grep -cE '^(Installation|Dry run)')\" -eq 1 ] && printf '%s' \"\$out\" | grep -q '^Installation complete.'"
 check "it reports the hook as verified"   "printf '%s' \"\$out\" | grep -q 'verified: a file without front matter is rejected'"
 check "core.hooksPath is .githooks"       "[ \"\$(git -C '$TMP/repo' config core.hooksPath)\" = .githooks ]"
 check "the first commit is made"          "[ \$(commits '$TMP/repo') -eq 1 ]"
@@ -159,7 +163,7 @@ check "…still installs the files"          "[ -e '$TMP/outer/sub/system/RULES.
 check "…and leaves that repo's hooksPath alone" "[ -z \"\$(git -C '$TMP/outer' config core.hooksPath)\" ]"
 check "without a git identity it still succeeds" \
   "env -u GIT_AUTHOR_NAME -u GIT_AUTHOR_EMAIL -u GIT_COMMITTER_NAME -u GIT_COMMITTER_EMAIL \
-     GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 bash '$ROOT/install.sh' --yes --git '$TMP/noid' \
+     GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_NOSYSTEM=1 '$BASH_BIN' '$ROOT/install.sh' --yes --git '$TMP/noid' \
    && [ -d '$TMP/noid/.git' ]"
 
 echo "10. --handoff sets up a code repo"
@@ -185,27 +189,27 @@ echo "11. Interactive mode, answered through LWW_TTY"
 # Order: mode, folder, project name, about, owner, structure, Obsidian, git, proceed.
 printf '1\nasked\nAsked Project\nA test project\nTester\n2\ny\ny\ny\n' > "$TMP/answers-ws"
 check "workspace answers are followed" \
-  "cd '$TMP' && env -u LWW_NONINTERACTIVE LWW_TTY='$TMP/answers-ws' bash '$ROOT/install.sh' >/dev/null 2>&1 \
+  "cd '$TMP' && env -u LWW_NONINTERACTIVE LWW_TTY='$TMP/answers-ws' '$BASH_BIN' '$ROOT/install.sh' >/dev/null 2>&1 \
    && [ -e '$TMP/asked/context/vision.md' ] && [ -e '$TMP/asked/.obsidian/app.json' ] \
    && grep -q 'Asked Project' '$TMP/asked/instruction.md' && grep -q 'A test project' '$TMP/asked/instruction.md' \
    && grep -qx 'owner: Tester' '$TMP/asked/state/STATE.md' && [ \$(commits '$TMP/asked') -eq 1 ]"
 printf '1\ndeclined\n\n\n\n1\nn\nn\nn\n' > "$TMP/answers-no"
 check "declining at Proceed writes nothing" \
-  "cd '$TMP' && env -u LWW_NONINTERACTIVE LWW_TTY='$TMP/answers-no' bash '$ROOT/install.sh' >/dev/null 2>&1 \
+  "cd '$TMP' && env -u LWW_NONINTERACTIVE LWW_TTY='$TMP/answers-no' '$BASH_BIN' '$ROOT/install.sh' >/dev/null 2>&1 \
    && [ ! -e '$TMP/declined' ]"
 printf '1\nexisting\n' > "$TMP/answers-exists"
-early=$(cd "$TMP" && env -u LWW_NONINTERACTIVE LWW_TTY="$TMP/answers-exists" bash "$ROOT/install.sh" 2>&1 || true)
+early=$(cd "$TMP" && env -u LWW_NONINTERACTIVE LWW_TTY="$TMP/answers-exists" "$BASH_BIN" "$ROOT/install.sh" 2>&1 || true)
 check "a non-empty folder is refused before the other questions" \
   "printf '%s' \"\$early\" | grep -q 'already exists' && ! printf '%s' \"\$early\" | grep -q 'Project name'"
 git init -q "$TMP/code3"
 printf '2\n%s\nn\ny\n' "$TMP/code3" > "$TMP/answers-ho"
 check "handoff answers are followed" \
-  "env -u LWW_NONINTERACTIVE LWW_TTY='$TMP/answers-ho' bash '$ROOT/install.sh' >/dev/null 2>&1 \
+  "env -u LWW_NONINTERACTIVE LWW_TTY='$TMP/answers-ho' '$BASH_BIN' '$ROOT/install.sh' >/dev/null 2>&1 \
    && [ -e '$TMP/code3/.handoff/templates/task.md' ] && grep -qx '\.handoff/' '$TMP/code3/.gitignore'"
 printf '\n\n\ny\n' > "$TMP/answers-flags"
 check "flags answer their own questions" \
   "env -u LWW_NONINTERACTIVE LWW_TTY='$TMP/answers-flags' \
-   bash '$ROOT/install.sh' --full --no-obsidian --no-git '$TMP/flagged' >/dev/null 2>&1 \
+   '$BASH_BIN' '$ROOT/install.sh' --full --no-obsidian --no-git '$TMP/flagged' >/dev/null 2>&1 \
    && [ -e '$TMP/flagged/context/vision.md' ] && [ ! -e '$TMP/flagged/.obsidian' ]"
 
 echo "12. bash and node installers agree"
@@ -233,7 +237,7 @@ echo "13. Eject leaves a bare workspace"
 mkdir -p "$TMP/tpl"
 cp -R "$ROOT/template" "$ROOT/handoff" "$ROOT/kickoff" "$ROOT/install.sh" "$ROOT/bin" "$ROOT/scripts" \
       "$ROOT/obsidian-preset" "$ROOT/package.json" "$ROOT/README.md" "$TMP/tpl/" 2>/dev/null
-bash "$TMP/tpl/install.sh" --yes --full --eject --project Mine "$TMP/tpl" >/dev/null 2>&1
+"$BASH_BIN" "$TMP/tpl/install.sh" --yes --full --eject --project Mine "$TMP/tpl" >/dev/null 2>&1
 check "the packaging is gone" "[ ! -e '$TMP/tpl/template' ] && [ ! -e '$TMP/tpl/handoff' ] && [ ! -e '$TMP/tpl/kickoff' ] && [ ! -e '$TMP/tpl/install.sh' ]"
 check "the workspace remains"  "[ -e '$TMP/tpl/system/RULES.md' ] && [ -e '$TMP/tpl/instruction.md' ]"
 check "README was replaced"    "! grep -q 'upstream-readme' '$TMP/tpl/README.md' && grep -qx '# Mine' '$TMP/tpl/README.md'"
@@ -243,29 +247,30 @@ echo "14. Survives a hostile PATH"
 mkdir -p "$TMP/hostile"
 printf '#!/bin/sh\necho "Unknown option: n" >&2\nexit 1\n' > "$TMP/hostile/head"; chmod +x "$TMP/hostile/head"
 check "install.sh runs with head(1) shadowed" \
-  "PATH='$TMP/hostile:$PATH' bash '$ROOT/install.sh' --yes --git '$TMP/hostile-out' && [ \$(commits '$TMP/hostile-out') -eq 1 ]"
+  "PATH='$TMP/hostile:$PATH' '$BASH_BIN' '$ROOT/install.sh' --yes --git '$TMP/hostile-out' && [ \$(commits '$TMP/hostile-out') -eq 1 ]"
 
 echo "15. Every outcome ends in a plain verdict, in both setups and both installers"
 # expect <installer> <label> <verdict-regex> <exit-code> <installer args...>
 # The verdict is the first line starting "Installation", "Dry run" or "Cancelled".
 expect() {
   inst="$1"; label="$2"; want="$3"; rc_want="$4"; shift 4
-  if [ "$inst" = bash ]; then out=$(bash "$ROOT/install.sh" "$@" 2>&1)
+  if [ "$inst" = bash ]; then out=$("$BASH_BIN" "$ROOT/install.sh" "$@" 2>&1)
   else out=$(node "$ROOT/bin/cli.js" "$@" 2>&1); fi
   rc=$?
   verdict=$(printf '%s\n' "$out" | grep -E '^(Installation|Dry run|Cancelled)' | sed -n 1p)
-  if [ "$rc" -eq "$rc_want" ] && printf '%s' "$verdict" | grep -qE "$want" \
+  verdicts=$(printf '%s\n' "$out" | grep -cE '^(Installation|Dry run|Cancelled)')
+  if [ "$rc" -eq "$rc_want" ] && [ "$verdicts" -eq 1 ] && printf '%s' "$verdict" | grep -qE "$want" \
      && ! printf '%s' "$out" | grep -q 'unexpected error'; then
     ok "$inst: $label"
   else
-    bad "$inst: $label (exit $rc, said: ${verdict:-nothing})"
+    bad "$inst: $label (exit $rc, $verdicts verdict line(s), first: ${verdict:-nothing})"
   fi
 }
 INSTALLERS="bash"; [ "$HAVE_NODE" -eq 1 ] && INSTALLERS="bash node"
 for inst in $INSTALLERS; do
   d="$TMP/outcome-$inst"; mkdir -p "$d"
   git init -q "$d/code"; touch "$d/afile"; mkdir -p "$d/ro"
-  bash "$ROOT/install.sh" --yes "$d/ws" >/dev/null 2>&1
+  "$BASH_BIN" "$ROOT/install.sh" --yes "$d/ws" >/dev/null 2>&1
   # handoff
   expect "$inst" "handoff into a code repo"        '^Installation complete\.$'        0 --yes --handoff "$d/code"
   expect "$inst" "handoff run again"               '^Installation complete\.$'        0 --yes --handoff "$d/code"
@@ -290,7 +295,7 @@ for inst in $INSTALLERS; do
 done
 printf '1\ncancelled\n\n\n\n1\nn\nn\nn\n' > "$TMP/answers-cancel"
 for inst in $INSTALLERS; do
-  if [ "$inst" = bash ]; then c=(bash "$ROOT/install.sh"); else c=(node "$ROOT/bin/cli.js"); fi
+  if [ "$inst" = bash ]; then c=("$BASH_BIN" "$ROOT/install.sh"); else c=(node "$ROOT/bin/cli.js"); fi
   out=$(cd "$TMP" && env -u LWW_NONINTERACTIVE LWW_TTY="$TMP/answers-cancel" "${c[@]}" 2>&1); rc=$?
   if [ "$rc" -eq 0 ] && printf '%s' "$out" | grep -q 'Cancelled. Nothing was written.' && [ ! -e "$TMP/cancelled" ]
   then ok "$inst: declining at Proceed says Cancelled"; else bad "$inst: declining at Proceed says Cancelled"; fi
@@ -322,7 +327,7 @@ RAW="https://raw.githubusercontent.com/${LWW_REPO:-aidilikbar/llm-wiki-workspace
 if curl -fsS --max-time 20 -o /dev/null "$RAW" 2>/dev/null; then
   mkdir -p "$TMP/alone"
   check "curl | bash installs a workspace" \
-    "cd '$TMP/alone' && curl -fsSL '$RAW' | bash -s -- --yes out && [ -e '$TMP/alone/out/system/RULES.md' ]"
+    "cd '$TMP/alone' && curl -fsSL '$RAW' | '$BASH_BIN' -s -- --yes out && [ -e '$TMP/alone/out/system/RULES.md' ]"
 else
   echo "  skip  no network to codeload.github.com"
 fi

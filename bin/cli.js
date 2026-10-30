@@ -10,7 +10,7 @@ const os = require('os');
 const path = require('path');
 const { spawnSync } = require('child_process');
 
-const VERSION = '0.2.0';
+const VERSION = '0.2.1';
 const ROOT = path.resolve(__dirname, '..');
 const SRC = path.join(ROOT, 'template');
 const PRESET = path.join(ROOT, 'obsidian-preset');

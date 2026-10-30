@@ -45,7 +45,7 @@ curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/main/
 It asks a few questions, then installs, checks its own work and reports:
 
 ```
-  LLM Wiki Workspace  v0.2.0
+  LLM Wiki Workspace  v0.2.1
 
  What would you like to set up?
    [1] A workspace: the knowledge base your agents read and write
@@ -137,8 +137,8 @@ curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/main/
 To install a specific release rather than the latest, use its tag in both places:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/v0.2.0/install.sh \
-  | LWW_REF=v0.2.0 bash
+curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/v0.2.1/install.sh \
+  | LWW_REF=v0.2.1 bash
 ```
 
 ### Other ways in

@@ -24,19 +24,11 @@ jobs:
       - name: Verification suite
         run: bash scripts/test.sh
 
-      - name: Installer under the system bash (3.2 on macOS)
+      - name: Verification suite under the system bash (3.2 on macOS)
+        if: runner.os == 'macOS'
         env:
-          GIT_AUTHOR_NAME: CI
-          GIT_AUTHOR_EMAIL: ci@example.invalid
-          GIT_COMMITTER_NAME: CI
-          GIT_COMMITTER_EMAIL: ci@example.invalid
-        run: |
-          /bin/bash --version | sed -n 1p
-          /bin/bash install.sh --yes --full --obsidian --git --project "CI check" "$RUNNER_TEMP/ws" | tee "$RUNNER_TEMP/out.txt"
-          grep -q '^Installation complete.$' "$RUNNER_TEMP/out.txt"
-          git init -q "$RUNNER_TEMP/code"
-          /bin/bash install.sh --yes --handoff "$RUNNER_TEMP/code" | tee "$RUNNER_TEMP/out2.txt"
-          grep -q '^Installation complete.$' "$RUNNER_TEMP/out2.txt"
+          LWW_BASH: /bin/bash
+        run: bash scripts/test.sh
 
       - name: Build the Obsidian vault zip
         run: bash scripts/make-vault-zip.sh ci

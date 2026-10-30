@@ -14,11 +14,11 @@
 #
 # To install a specific release instead of main, set LWW_REF to its tag:
 #
-#   curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/v0.2.0/install.sh | LWW_REF=v0.2.0 bash
+#   curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/v0.2.1/install.sh | LWW_REF=v0.2.1 bash
 
 set -Eeuo pipefail
 
-VERSION="0.2.0"
+VERSION="0.2.1"
 REPO_SLUG="${LWW_REPO:-aidilikbar/llm-wiki-workspace}"
 REF="${LWW_REF:-main}"
 
@@ -78,7 +78,10 @@ fail() {
   for line in "$@"; do printf '%s\n' "$line" >&2; done
   exit 1
 }
-trap 'fail "unexpected error on line $LINENO of install.sh, while running: $BASH_COMMAND"' ERR
+# Report only from the main shell. bash 3.2, the default on macOS, also runs this trap
+# inside $(...) subshells, including ones whose failure is expected and handled by an
+# `if` around them. A failure that matters still reaches the main shell and is reported.
+trap 'if [ "${BASH_SUBSHELL:-0}" -eq 0 ]; then fail "unexpected error on line $LINENO of install.sh, while running: $BASH_COMMAND"; fi' ERR
 
 usage() {
   cat <<'USAGE'

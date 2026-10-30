@@ -8,7 +8,29 @@ permissions:
   contents: write
 
 jobs:
+  # Nothing is published unless the suite passes on Linux and on macOS, including
+  # under macOS's own bash 3.2, which is what most Mac users run.
+  verify:
+    name: verify on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Verification suite
+        run: bash scripts/test.sh
+      - name: Verification suite under the system bash (3.2 on macOS)
+        if: runner.os == 'macOS'
+        env:
+          LWW_BASH: /bin/bash
+        run: bash scripts/test.sh
+
   release:
+    needs: verify
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
