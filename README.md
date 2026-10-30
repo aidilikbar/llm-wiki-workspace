@@ -36,116 +36,153 @@ authority as one written this morning.
 
 ## Install
 
-Open a terminal in the folder where the workspace should live and run:
+Open a terminal where the workspace should go and run:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/main/install.sh | bash
 ```
 
-It asks what you want, then generates it:
+It asks a few questions, then installs, checks its own work and reports:
 
 ```
-  LLM Wiki Workspace  v0.1.0
+  LLM Wiki Workspace  v0.2.0
 
  What would you like to set up?
-   [1] A workspace — the knowledge base your agents read and write
-   [2] A .handoff/ exchange in a code repo — for the planner–executor workflow
+   [1] A workspace: the knowledge base your agents read and write
+   [2] A .handoff/ exchange in a code repo, for the planner-executor workflow
  > [1]:
 
- Where should the workspace go? A folder name, or . for this folder [.]: my-project
+ Folder for the workspace (a new folder name) [my-workspace]: recipe-kb
+
+ Project name [recipe-kb]: Recipe Site
+ What are you making? A sentence or two, or Enter to skip: A site for family recipes.
+ Your name, for the owner field in each file [Ana Lim]:
 
  Which structure?
-   [1] Core — the files you fill in during week one (recommended)
-   [2] Full — every folder, including design, architecture and evals
+   [1] Core: the files you fill in during week one (recommended)
+   [2] Full: every folder, including design, architecture and evals
  > [1]:
 
  Configure it as an Obsidian vault? [y/N]: y
- Initialise git and turn on the front-matter check? [Y/n]:
+ Set up git, the front-matter check and a first commit? [Y/n]:
 
-  core workspace into my-project/, as an Obsidian vault, with git and the front-matter check
+  Project    Recipe Site
+  Folder     recipe-kb/
+  Owner      Ana Lim
+  Setup      core, Obsidian vault, git
+
  Proceed? [Y/n]:
+
+Installation complete.
+
+  Project    Recipe Site
+  Folder     recipe-kb/  (40 file(s), core)
+  Owner      Ana Lim
+  Obsidian   configured: open the folder as a vault
+  Git        new repository
+  Check      on, and verified: a file without front matter is rejected
+  Commit     first commit made
+
+Next:
+  cd recipe-kb
+  Open the folder with your AI agent and tell it:
+
+      Read instruction.md and start the kick-off.
 ```
 
-Press Enter to take the default in brackets. Nothing already in the folder is
-overwritten.
+Press Enter to take the default in brackets.
+
+If something goes wrong, it says so and stops. The folder must be new or empty; an
+existing folder with files in it is refused before anything is written, with the options
+to continue. If the check cannot be verified, or git is missing, the report says
+"Installation finished, with problems" and names them.
+
+### What the installer checks for you
+
+With git selected, it initialises the repository, turns on the front-matter hook, and
+proves the hook works: in a throwaway repository it commits a file without front matter,
+which must be rejected, and one with front matter, which must be accepted. Then it makes
+your first commit, which passes through the same hook. If git does not know your name and
+email yet, it says so and prints the two commands to set them.
+
+Without git, the front-matter check is off. The workspace still works as a set of
+folders and rules, but nothing enforces the front matter.
 
 ### Without the questions
 
-Every question has a flag. Pass `--yes` and anything not given takes its default — use
-this in scripts, CI, or when you already know what you want:
+Every question has a flag. With `--yes`, anything not given takes its default, so the
+installer runs in scripts and CI:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/main/install.sh \
-  | bash -s -- --yes --full --obsidian --git my-project
+  | bash -s -- --yes --full --obsidian --git --project "Recipe Site" --owner "Ana Lim" recipe-kb
 ```
 
 | Flag | Effect |
 |---|---|
+| `--project NAME` | Project name for the kick-off brief (default: the folder name) |
+| `--about TEXT` | What you are making, in a sentence or two |
+| `--owner NAME` | Your name, written into each file's `owner` field |
 | `--core` / `--full` | Core tier (default) or the entire tree |
 | `--obsidian` / `--no-obsidian` | Write `.obsidian/` so the folder opens as a configured vault |
-| `--git` / `--no-git` | `git init` if needed and set `core.hooksPath` so the front-matter check runs |
+| `--git` / `--no-git` | Set up git, verify the front-matter check, make the first commit |
+| `--merge` | Install into a folder that is not empty, adding only missing files |
+| `--force` | Install into a folder that is not empty, overwriting existing files |
 | `--handoff` | Set up a `.handoff/` exchange in an existing code repo instead of a workspace |
 | `--handoff-ignore` | With `--handoff`: add `.handoff/` to that repo's `.gitignore` |
-| `--force` | Overwrite files that already exist |
-| `--eject` | Remove the packaging afterwards — for a repo made with "Use this template" |
+| `--eject` | Remove the packaging afterwards, for a repo made with "Use this template" |
 | `--dry-run` | Print what would happen, write nothing |
 | `-y`, `--yes` | Never ask |
 
+To install a specific release rather than the latest, use its tag in both places:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/aidilikbar/llm-wiki-workspace/v0.2.0/install.sh \
+  | LWW_REF=v0.2.0 bash
+```
+
 ### Other ways in
 
-- **npx** — `npx llm-wiki-workspace` asks the same questions and takes the same flags.
+- **npx:** `npx llm-wiki-workspace` asks the same questions and takes the same flags.
   Use it on Windows, where it runs without bash. On Windows it cannot open the terminal
-  for questions, so pass flags. *Not yet published to npm — until it is, use the curl
+  for questions, so pass flags. *Not yet published to npm; until it is, use the curl
   route.*
-- **GitHub template** — click **Use this template** on
+- **GitHub template:** click **Use this template** on
   [the repository](https://github.com/aidilikbar/llm-wiki-workspace), clone it, then run
   `bash install.sh --yes --full --eject .` to flatten it. `--eject` deletes `template/`,
-  `handoff/`, `install.sh` and the other packaging; your README is replaced with a stub
-  only if it is still this one.
-- **Obsidian vault, no terminal** — download `llm-wiki-workspace-vault-<version>.zip`
+  `handoff/`, `kickoff/`, `install.sh` and the other packaging; your README is replaced
+  with a stub only if it is still this one.
+- **Obsidian vault, no terminal:** download `llm-wiki-workspace-vault-<version>.zip`
   from [Releases](https://github.com/aidilikbar/llm-wiki-workspace/releases), unzip it,
-  and choose **Open folder as vault**.
+  and choose **Open folder as vault**. This copy has no git, so the front-matter check
+  is off.
 
-## Make sure it is running
+## The kick-off
 
-If you answered yes to git, the front-matter check is already on. Otherwise:
+The installer writes `instruction.md` at the root of the workspace: a brief with your
+project's name and description, and the steps for a first session. Open the folder with
+your agent and tell it:
 
-```bash
-git config core.hooksPath .githooks
+```
+Read instruction.md and start the kick-off.
 ```
 
-That setting is per clone — anyone who clones your repo runs it too. Then prove it works.
-This commit must be rejected:
+The agent asks what the description leaves out, then drafts, for you to approve:
 
-```bash
-printf '# no front matter\n' > context/constraints/tmp-check.md
-git add context/constraints/tmp-check.md && git commit -m 'should fail'
-rm context/constraints/tmp-check.md
-```
+1. **`context/vision.md`**: what the project is, for whom, and what success looks like.
+2. **`context/constraints/`**: where your project must not follow the common approach.
+   Agents default to the common approach, so this is the folder that prevents the most
+   rework.
+3. **`context/requirements/`**: one file per requirement, each with acceptance criteria.
+4. **`state/backlog/`**: the first work items.
+5. **The `## Commands` block in `AGENTS.md`**: your real install, test, lint and build
+   commands, if there is a code repo.
+6. **`state/STATE.md`, `state/handoff.md`** and a first **`record/logbook/`** entry.
 
-Expected output: `front matter missing entirely: context/constraints/tmp-check.md`, and no
-new commit. If the commit succeeds, the hook is not on — check that `.githooks/pre-commit`
-exists and is executable.
-
-The hook checks staged markdown only, skips `README.md`, `AGENTS.md` and `work/temp/`,
-and warns without blocking when a `review_by` date has passed.
-
-## Fill it in, in this order
-
-1. **`context/constraints/`** — first, and it is not close. Constraints record where your
-   project deliberately diverges from the statistically common pattern, which is exactly
-   what an agent defaults to. Template: `system/templates/constraint.md`.
-2. **`system/agents/escalation.md`** — what the agent may decide alone, what it must
-   propose, what it must never do without you.
-3. **The `## Commands` block at the bottom of `AGENTS.md`** — your real install, test,
-   lint and build invocations. Exact commands, not descriptions.
-4. **`context/requirements/`** — one file per requirement, each with its own acceptance
-   criteria. Together they are the definition of done.
-5. **`state/STATE.md`** — at the end of every working session. One screen, no history.
-6. **`record/logbook/`** — one entry per session. Never edit one afterwards.
-
-Everything else can stay a `TODO` until something forces it. The installer stamps
-`updated:` with the install date, so the freshness clock starts the day you adopt it.
+When you have approved the drafts, the agent moves `instruction.md` to
+`record/logbook/` as the record of how the project started. Review
+`system/agents/escalation.md` yourself at some point: it sets what the agent may decide
+alone, and the defaults may not match how you work.
 
 ## One file per item
 
@@ -293,8 +330,8 @@ into them, find nothing, and retry — and they signal abandonment to humans.
 `record/backlog/`, `work/sources/INDEX.md`, `work/temp/`, and the zone `AGENTS.md` files.
 
 **Full:** everything else, including the workflows, research, prompts, sprints, icebox,
-design, architecture and evals. Re-running the installer is safe — existing files are
-skipped — so starting core and adding `--full` later costs nothing.
+design, architecture and evals. To add the full tier to a core workspace later, run the
+installer again in that folder with `--merge --full`. Existing files are kept.
 
 ## Customising it
 
@@ -315,6 +352,7 @@ This repository is the installer, not the workspace.
 | Path | What it is |
 |---|---|
 | `template/` | The workspace — what a workspace install writes |
+| `kickoff/` | The kick-off brief, written as `instruction.md` with your answers filled in |
 | `handoff/` | What `--handoff` writes into a code repo as `.handoff/` |
 | `obsidian-preset/` | Vault config, written to `.obsidian/` by `--obsidian` |
 | `install.sh` | The installer; downloads the repository itself when piped from curl |
@@ -330,11 +368,13 @@ This repository is the installer, not the workspace.
 bash scripts/test.sh
 ```
 
-Covers both installers producing identical results in every mode, the interactive
-questions, `--handoff` being idempotent in a code repo, `--git` turning the check on and
-the hook blocking a bad commit, one-file-per-item holding across the template, no file
-referencing a path that no longer exists, front matter on every payload file, and the
-installer surviving a shadowed `head(1)` on `PATH`. CI runs it on Linux and macOS.
+It covers both installers producing identical results in every mode, the interactive
+questions, refusal of non-empty folders, the kick-off brief (including names with `&`,
+`/`, `\` and `$`), `--handoff` being idempotent in a code repo, `--git` verifying the hook
+and making the first commit, the hook checking the staged version of each file, front
+matter on every payload file, no file referencing a path that no longer exists, the
+installer surviving a shadowed `head(1)` on `PATH`, and the published `curl | bash`
+route. CI runs it on Linux and macOS.
 
 The last check scans for names that must never be published. The list is not in this
 repository — publishing it would leak what it exists to prevent. Put one term per line in

@@ -2,6 +2,9 @@
 
 Read this before doing anything else in this repository.
 
+If `instruction.md` exists next to this file, the project has not been kicked off yet.
+Read it and follow it before anything below.
+
 ## Read order
 
 1. `state/STATE.md` — what is happening right now

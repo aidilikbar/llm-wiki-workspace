@@ -34,22 +34,13 @@ classification: public
 
 # Open this folder as an Obsidian vault
 
-1. Open Obsidian → **Open folder as vault** → choose this folder.
-2. Trust the folder when asked. The bundled config only sets core plugins, the
-   templates folder and graph colours; there are no community plugins.
-3. Start at `AGENTS.md`, then `system/RULES.md`.
-4. Fill `context/constraints/` first. It prevents more bad agent work than anything
-   else in the tree.
+1. In Obsidian, choose **Open folder as vault** and pick this folder.
+2. Open the folder with your AI agent and tell it: *Read instruction.md and start the
+   kick-off.*
+3. Delete this file.
 
-To version this vault with git as well:
-
-```bash
-git init
-git config core.hooksPath .githooks
-git add -A && git commit -m "Start workspace"
-```
-
-Delete this file once you have read it.
+This copy has no git, so the front-matter check is off. To turn it on, run the
+installer instead: it sets up git, checks the hook and makes the first commit.
 NOTE
 
 (cd "$STAGE" && zip -qr "$OUT/$NAME-$VERSION.zip" "$NAME")
